@@ -1,8 +1,8 @@
 package com.bomberman.game;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -12,7 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 
-public class MainMenuScreen implements Screen {
+public class GameoverScreen implements Screen {
 
     final BomberMan game;
 
@@ -21,7 +21,7 @@ public class MainMenuScreen implements Screen {
     private Stage stage;
     private Skin skin;
 
-    public MainMenuScreen(final BomberMan gam) {
+    public GameoverScreen(final BomberMan gam) {
         game = gam;
 
         camera = new OrthographicCamera();
@@ -32,7 +32,7 @@ public class MainMenuScreen implements Screen {
 
         skin = new Skin(Gdx.files.internal("uiskin.json"));
 
-        TextButton buttonStart = new TextButton("START",skin);
+        TextButton buttonStart = new TextButton("Restart",skin);
         buttonStart.setWidth(200);
         buttonStart.setHeight(50);
         buttonStart.setPosition(1280/2-200/2,500);
@@ -45,6 +45,7 @@ public class MainMenuScreen implements Screen {
                 game.setScreen(new GameScreen(game));
             }
         });
+
 
     }
 
@@ -61,23 +62,23 @@ public class MainMenuScreen implements Screen {
         stage.act(Gdx.graphics.getDeltaTime());
         stage.draw();
 
-
-
-        /*
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
 
         game.batch.begin();
-        game.font.draw(game.batch, "Welcome to BomberMan!!! ", 300, 300);
-        game.font.draw(game.batch, "Press Enter keys to begin!", 300, 199);
+        game.font.draw(game.batch, "Game Over ", 450, 800);
+        game.font.getData().setScale(5,5);
+
         game.batch.end();
 
-        if (Gdx.input.isKeyPressed(Input.Keys.ENTER)) {
+   /*     if (Gdx.input.isKeyPressed(Input.Keys.ENTER)) {
             game.setScreen(new GameScreen(game));
             dispose();
         }
 
-         */
+    */
+
+
 
     }
 

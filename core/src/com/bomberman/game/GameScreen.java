@@ -7,8 +7,11 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
+import sun.rmi.runtime.Log;
 
 
 import java.awt.*;
@@ -17,41 +20,51 @@ import java.util.Iterator;
 public class GameScreen implements Screen {
 
     final BomberMan game;
+    private Stage stage;
 
     OrthographicCamera camera;
-    Texture DotImg;
+    Texture ManImg;
     Texture bg;
     Texture BombImg;
+    Texture BoomImg;
     Texture EnemyImg;
-    Rectangle Dot;
+    Rectangle Man;
     Rectangle Enemy;
 
 
     Array<Rectangle> bombs;
+    Array<Rectangle> booms;
     long bombstime;
+    long boomstime;
 
     int i=0;
     int j=0;
+    int boomX;
+    int boomY;
 
     public GameScreen(final BomberMan gam) {
         this.game = gam;
 
-        DotImg = new Texture("point.png");
+        ManImg = new Texture("hero.png");
         BombImg = new Texture("bomb.png");
+        BoomImg = new Texture("boom.png");
         bg = new Texture("bg.png");
-        EnemyImg = new Texture("cat.png");
+        EnemyImg = new Texture("enemy.png");
 
 
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, 1920, 1080);
+        camera.setToOrtho(false, 1280, 1024);
+        stage = new Stage(new StretchViewport(1280, 1024));
+        Gdx.input.setInputProcessor(stage);
 
-        Dot = new Rectangle();
-        Dot.x = 0;
-        Dot.y = 0;
-        Dot.width = 8;
-        Dot.height = 8;
+        Man = new Rectangle();
+        Man.x = 0;
+        Man.y = 0;
+        Man.width = 64;
+        Man.height = 64;
 
         bombs = new Array<Rectangle>();
+        booms = new Array<Rectangle>();
 
         Enemy = new Rectangle();
         Enemy.x = 200;
@@ -64,14 +77,30 @@ public class GameScreen implements Screen {
 
         if (i<1){
             Rectangle bomb = new Rectangle();
-            bomb.x = Dot.x;
-            bomb.y = Dot.y;
-            bomb.width = 8;
-            bomb.height = 8;
+            bomb.x = Man.x;
+            bomb.y = Man.y;
+            bomb.width = 64;
+            bomb.height = 64;
             bombs.add(bomb);
 
             bombstime = TimeUtils.nanoTime();
+
+            boomX = bomb.x;
+            boomY = bomb.y;
+
         }
+
+    }
+
+    private void spawnboom(int x ,int y){
+        Rectangle boom = new Rectangle();
+        boom.x = boomX+x;
+        boom.y = boomY+y;
+        boom.width = 64;
+        boom.height = 64;
+        booms.add(boom);
+
+        boomstime = TimeUtils.nanoTime();
 
     }
 
@@ -90,43 +119,56 @@ public class GameScreen implements Screen {
 
         game.batch.begin();
 
-        game.batch.draw(DotImg,Dot.x,Dot.y);
+        game.batch.draw(bg,0,0);
+        game.batch.draw(ManImg,Man.x, Man.y,Man.width,Man.height);
         for(Rectangle bomb: bombs) {
-            game.batch.draw(BombImg, bomb.x, bomb.y);
+            game.batch.draw(BombImg, bomb.x, bomb.y,bomb.width,bomb.height);
+        }
+        for(Rectangle boom: booms) {
+            game.batch.draw(BoomImg, boom.x, boom.y,boom.width,boom.height);
         }
 
         game.batch.draw(EnemyImg,Enemy.x,Enemy.y);
 
 
-
         game.batch.end();
 
+        Gdx.app.log("LOG","Boom Time: " + boomstime +"Bomb Time: "+ bombstime +"TimeUnit: "+TimeUtils.nanoTime());
+
+
         if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-            Dot.y += 500 * Gdx.graphics.getDeltaTime();
+            Man.y += 500 * Gdx.graphics.getDeltaTime();
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-            Dot.x -= 500 * Gdx.graphics.getDeltaTime();
+            Man.x -= 500 * Gdx.graphics.getDeltaTime();
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-            Dot.y -= 500 * Gdx.graphics.getDeltaTime();
+            Man.y -= 500 * Gdx.graphics.getDeltaTime();
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-            Dot.x += 500 * Gdx.graphics.getDeltaTime();
+            Man.x += 500 * Gdx.graphics.getDeltaTime();
         }
 
-        if(Dot.x < 0) Dot.x = 0;
-        if(Dot.x > 1700) Dot.x = 1700;
+        if(Man.x < 0) Man.x = 0;
+        if(Man.x+64 > 800) Man.x = 800-64;
 
-        if(Dot.y < 0) Dot.y = 0;
-        if(Dot.y > 900) Dot.y = 900;
+        if(Man.y < 0) Man.y = 0;
+        if(Man.y+64 > 480) Man.y = 480-64;
 
-        if (Dot.x == Enemy.x) Dot.x = 0;
+        if(((Man.y >= Enemy.y)&&(Man.y <= Enemy.y+64)) || ((Man.y+64 >= Enemy.y)&&(Man.y+64 <= Enemy.y+64))){
+
+            if ((Man.x+64 >= Enemy.x)&&(Man.x<=Enemy.x+64)){
+                game.setScreen(new GameoverScreen(game));
+
+            }
+
+        }
 
         if (j < 1){
-            if (Enemy.x > 1000){
+            if (Enemy.x+64 > 800){
                 j=1;
             }
             Enemy.x += 200 *Gdx.graphics.getDeltaTime();
@@ -138,9 +180,6 @@ public class GameScreen implements Screen {
             }
             Enemy.x -= 200*Gdx.graphics.getDeltaTime();
         }
-
-
-
 
 
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE)){
@@ -155,12 +194,27 @@ public class GameScreen implements Screen {
         Iterator<Rectangle> iter = bombs.iterator();
         while (iter.hasNext()) {
             Rectangle bomb = iter.next();
-            if(TimeUtils.nanoTime() - bombstime > 1000000000) {
+            if(TimeUtils.nanoTime() - bombstime > 2000000000) {
                 i = 0;
+                spawnboom(64,0);
+                spawnboom(-64,0);
+                spawnboom(0,64);
+                spawnboom(0,-64);
+
+
                 iter.remove();
+
 
             }
 
+        }
+
+        Iterator<Rectangle> iter2 = booms.iterator();
+        while (iter2.hasNext()){
+            Rectangle boom = iter2.next();
+            if (TimeUtils.nanoTime() - boomstime  > 1000000000){
+                iter2.remove();
+            }
         }
 
 
