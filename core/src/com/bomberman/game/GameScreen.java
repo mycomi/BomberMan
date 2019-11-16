@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 
+
 import java.awt.*;
 import java.util.Iterator;
 
@@ -21,12 +22,16 @@ public class GameScreen implements Screen {
     Texture DotImg;
     Texture bg;
     Texture BombImg;
+    Texture EnemyImg;
     Rectangle Dot;
+    Rectangle Enemy;
+
 
     Array<Rectangle> bombs;
     long bombstime;
 
     int i=0;
+    int j=0;
 
     public GameScreen(final BomberMan gam) {
         this.game = gam;
@@ -34,6 +39,8 @@ public class GameScreen implements Screen {
         DotImg = new Texture("point.png");
         BombImg = new Texture("bomb.png");
         bg = new Texture("bg.png");
+        EnemyImg = new Texture("cat.png");
+
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 1920, 1080);
@@ -45,6 +52,11 @@ public class GameScreen implements Screen {
         Dot.height = 8;
 
         bombs = new Array<Rectangle>();
+
+        Enemy = new Rectangle();
+        Enemy.x = 200;
+        Enemy.y = 200;
+
 
     }
 
@@ -62,6 +74,7 @@ public class GameScreen implements Screen {
         }
 
     }
+
 
     @Override
     public void show() {
@@ -81,6 +94,10 @@ public class GameScreen implements Screen {
         for(Rectangle bomb: bombs) {
             game.batch.draw(BombImg, bomb.x, bomb.y);
         }
+
+        game.batch.draw(EnemyImg,Enemy.x,Enemy.y);
+
+
 
         game.batch.end();
 
@@ -106,12 +123,34 @@ public class GameScreen implements Screen {
         if(Dot.y < 0) Dot.y = 0;
         if(Dot.y > 900) Dot.y = 900;
 
+        if (Dot.x == Enemy.x) Dot.x = 0;
+
+        if (j < 1){
+            if (Enemy.x > 1000){
+                j=1;
+            }
+            Enemy.x += 200 *Gdx.graphics.getDeltaTime();
+        }
+
+        if (j == 1){
+            if (Enemy.x <0){
+                j=0;
+            }
+            Enemy.x -= 200*Gdx.graphics.getDeltaTime();
+        }
+
+
+
+
+
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE)){
 
             spawnbomb();
             i++;
 
         }
+
+
 
         Iterator<Rectangle> iter = bombs.iterator();
         while (iter.hasNext()) {
@@ -123,6 +162,7 @@ public class GameScreen implements Screen {
             }
 
         }
+
 
     }
 
