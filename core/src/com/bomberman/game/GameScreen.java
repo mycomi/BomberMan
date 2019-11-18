@@ -30,11 +30,12 @@ public class GameScreen implements Screen {
     Texture BoomImg;
     Texture EnemyImg;
     Rectangle Man;
-    Rectangle Enemy;
+  //  Rectangle Enemy;
 
 
     Array<Rectangle> bombs;
     Array<Rectangle> booms;
+    Array<Rectangle> enemys;
     long bombstime;
     long boomstime;
 
@@ -42,6 +43,10 @@ public class GameScreen implements Screen {
     int j=0;
     int boomX;
     int boomY;
+
+    int enemyX = 100 ;
+    int enemyY = 100;
+
 
     public GameScreen(final BomberMan gam) {
         this.game = gam;
@@ -66,10 +71,8 @@ public class GameScreen implements Screen {
 
         bombs = new Array<Rectangle>();
         booms = new Array<Rectangle>();
+        enemys = new Array<Rectangle>();
 
-        Enemy = new Rectangle();
-        Enemy.x = 200;
-        Enemy.y = 200;
 
 
     }
@@ -105,6 +108,19 @@ public class GameScreen implements Screen {
 
     }
 
+    private void spawnEnemy(int x,int y){
+        Rectangle enemy = new Rectangle();
+        enemy.x = x;
+        enemy.y = y;
+        enemy.width = 64;
+        enemy.height = 64;
+        enemys.add(enemy);
+
+        enemyX = enemy.x;
+        enemyY = enemy.y;
+    }
+
+
 
     @Override
     public void show() {
@@ -129,7 +145,10 @@ public class GameScreen implements Screen {
             game.batch.draw(BoomImg, boom.x, boom.y,boom.width,boom.height);
         }
 
-        game.batch.draw(EnemyImg,Enemy.x,Enemy.y);
+        for(Rectangle enemy: enemys) {
+            game.batch.draw(EnemyImg,enemy.x,enemy.y,enemy.width,enemy.height);
+
+        }
 
 
         game.batch.end();
@@ -159,28 +178,31 @@ public class GameScreen implements Screen {
         if(Man.y < 0) Man.y = 0;
         if(Man.y+64 > 1024) Man.y = 1024-64;
 
-        if(((Man.y >= Enemy.y)&&(Man.y <= Enemy.y+64)) || ((Man.y+64 >= Enemy.y)&&(Man.y+64 <= Enemy.y+64))){
+        if(((Man.y >= enemyY)&&(Man.y <= enemyY+64)) || ((Man.y+64 >= enemyY)&&(Man.y+64 <= enemyY+64))){
 
-            if ((Man.x+64 >= Enemy.x)&&(Man.x<=Enemy.x+64)){
+            if ((Man.x+64 >= enemyX)&&(Man.x<=enemyX+64)){
                 game.setScreen(new GameoverScreen(game));
 
             }
 
         }
 
+        /*
         if (j < 1){
-            if (Enemy.x+64 > 1200){
+            if (enemyX+64 > 1200){
                 j=1;
             }
-            Enemy.x += 200 *Gdx.graphics.getDeltaTime();
+            enemyX += 200 *Gdx.graphics.getDeltaTime();
         }
 
         if (j == 1){
-            if (Enemy.x <0){
+            if (enemyX <0){
                 j=0;
             }
-            Enemy.x -= 200*Gdx.graphics.getDeltaTime();
+            enemyX -= 200*Gdx.graphics.getDeltaTime();
         }
+
+         */
 
 
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE)){
@@ -188,7 +210,11 @@ public class GameScreen implements Screen {
             spawnbomb();
             i++;
 
+
         }
+
+        spawnEnemy(800,800);
+        spawnEnemy(1000,500);
 
 
 
