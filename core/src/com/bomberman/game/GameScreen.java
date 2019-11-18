@@ -17,6 +17,7 @@ import sun.rmi.runtime.Log;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 public class GameScreen implements Screen {
 
@@ -30,12 +31,14 @@ public class GameScreen implements Screen {
     Texture BoomImg;
     Texture EnemyImg;
     Rectangle Man;
-  //  Rectangle Enemy;
 
 
     Array<Rectangle> bombs;
     Array<Rectangle> booms;
-    Array<Rectangle> enemys;
+
+    LinkedList<Rectangle> enemys;
+
+
     long bombstime;
     long boomstime;
 
@@ -44,8 +47,6 @@ public class GameScreen implements Screen {
     int boomX;
     int boomY;
 
-    int enemyX = 100 ;
-    int enemyY = 100;
 
 
     public GameScreen(final BomberMan gam) {
@@ -71,8 +72,8 @@ public class GameScreen implements Screen {
 
         bombs = new Array<Rectangle>();
         booms = new Array<Rectangle>();
-        enemys = new Array<Rectangle>();
 
+        enemys = new LinkedList<Rectangle>();
 
 
     }
@@ -108,23 +109,21 @@ public class GameScreen implements Screen {
 
     }
 
-    private void spawnEnemy(int x,int y){
+    private void spawnenemy(int x,int y){
         Rectangle enemy = new Rectangle();
         enemy.x = x;
         enemy.y = y;
         enemy.width = 64;
         enemy.height = 64;
         enemys.add(enemy);
-
-        enemyX = enemy.x;
-        enemyY = enemy.y;
     }
-
 
 
     @Override
     public void show() {
 
+        spawnenemy(200,200);
+        spawnenemy(500,500);
     }
 
     @Override
@@ -146,10 +145,8 @@ public class GameScreen implements Screen {
         }
 
         for(Rectangle enemy: enemys) {
-            game.batch.draw(EnemyImg,enemy.x,enemy.y,enemy.width,enemy.height);
-
+            game.batch.draw(EnemyImg, enemy.x, enemy.y,enemy.width,enemy.height);
         }
-
 
         game.batch.end();
 
@@ -178,31 +175,31 @@ public class GameScreen implements Screen {
         if(Man.y < 0) Man.y = 0;
         if(Man.y+64 > 1024) Man.y = 1024-64;
 
-        if(((Man.y >= enemyY)&&(Man.y <= enemyY+64)) || ((Man.y+64 >= enemyY)&&(Man.y+64 <= enemyY+64))){
+        for(Rectangle enemy: enemys) {
+            if(((Man.y >= enemy.y)&&(Man.y <= enemy.y+64)) || ((Man.y+64 >= enemy.y)&&(Man.y+64 <= enemy.y+64))){
 
-            if ((Man.x+64 >= enemyX)&&(Man.x<=enemyX+64)){
-                game.setScreen(new GameoverScreen(game));
+                if ((Man.x+64 >= enemy.x)&&(Man.x<= enemy.x+64)){
+                    game.setScreen(new GameoverScreen(game));
+                }
+            }
 
+            if (j < 1){
+                if (enemy.x+64 > 1200){
+                    j=1;
+                }
+                enemy.x += 200 *Gdx.graphics.getDeltaTime();
+            }
+
+            if (j == 1){
+                if (enemy.x <0){
+                    j=0;
+                }
+                enemy.x -= 200*Gdx.graphics.getDeltaTime();
             }
 
         }
 
-        /*
-        if (j < 1){
-            if (enemyX+64 > 1200){
-                j=1;
-            }
-            enemyX += 200 *Gdx.graphics.getDeltaTime();
-        }
 
-        if (j == 1){
-            if (enemyX <0){
-                j=0;
-            }
-            enemyX -= 200*Gdx.graphics.getDeltaTime();
-        }
-
-         */
 
 
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE)){
@@ -212,9 +209,6 @@ public class GameScreen implements Screen {
 
 
         }
-
-        spawnEnemy(800,800);
-        spawnEnemy(1000,500);
 
 
 
@@ -227,6 +221,7 @@ public class GameScreen implements Screen {
                 spawnboom(-64,0);
                 spawnboom(0,64);
                 spawnboom(0,-64);
+                spawnboom(0,0);
 
 
                 iter.remove();
@@ -243,6 +238,7 @@ public class GameScreen implements Screen {
                 iter2.remove();
             }
         }
+
 
 
     }
