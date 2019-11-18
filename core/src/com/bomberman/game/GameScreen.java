@@ -15,6 +15,7 @@ import sun.rmi.runtime.Log;
 
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.util.Iterator;
 
 public class GameScreen implements Screen {
@@ -136,27 +137,27 @@ public class GameScreen implements Screen {
         Gdx.app.log("LOG","Boom Time: " + boomstime +"Bomb Time: "+ bombstime +"TimeUnit: "+TimeUtils.nanoTime());
 
 
-        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) {
             Man.y += 500 * Gdx.graphics.getDeltaTime();
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             Man.x -= 500 * Gdx.graphics.getDeltaTime();
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
             Man.y -= 500 * Gdx.graphics.getDeltaTime();
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             Man.x += 500 * Gdx.graphics.getDeltaTime();
         }
 
         if(Man.x < 0) Man.x = 0;
-        if(Man.x+64 > 800) Man.x = 800-64;
+        if(Man.x+64 > 1280) Man.x = 1280-64;
 
         if(Man.y < 0) Man.y = 0;
-        if(Man.y+64 > 480) Man.y = 480-64;
+        if(Man.y+64 > 1024) Man.y = 1024-64;
 
         if(((Man.y >= Enemy.y)&&(Man.y <= Enemy.y+64)) || ((Man.y+64 >= Enemy.y)&&(Man.y+64 <= Enemy.y+64))){
 
@@ -168,7 +169,7 @@ public class GameScreen implements Screen {
         }
 
         if (j < 1){
-            if (Enemy.x+64 > 800){
+            if (Enemy.x+64 > 1200){
                 j=1;
             }
             Enemy.x += 200 *Gdx.graphics.getDeltaTime();
