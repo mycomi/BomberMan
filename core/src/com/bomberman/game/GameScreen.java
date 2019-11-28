@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -11,6 +12,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.badlogic.gdx.math.Rectangle;
+import com.bomberman.game.object.Ublock;
 import javafx.scene.input.Mnemonic;
 import sun.rmi.runtime.Log;
 
@@ -34,7 +37,8 @@ public class GameScreen implements Screen {
 
     private GameScreen layer;
 
-
+    private  Ublock ublock;
+    SpriteBatch batch;
     OrthographicCamera camera;
     Texture ManImg;
     Texture bg;
@@ -51,15 +55,19 @@ public class GameScreen implements Screen {
 
     LinkedList<Rectangle> Bblocks;
     LinkedList<Rectangle> enemys;
-
+    Array<Ublock> ublockslist;
 
     long bombstime;
     long boomstime;
 
     int i=0;
     int j=0;
-    int boomX;
-    int boomY;
+    int k = 0;
+    int l = 0;
+    int x = 0;
+    int y = 0;
+    float boomX;
+    float boomY;
     int[][] map = {
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
@@ -100,10 +108,12 @@ public class GameScreen implements Screen {
         Gdx.input.setInputProcessor(stage);
 
         Man = new Rectangle();
-        Man.x = 64;
-        Man.y = 64;
+        Man.x = 300;
+        Man.y = 300;
         Man.width = 64;
         Man.height = 64;
+
+
 
         bombs = new Array<Rectangle>();
         booms = new Array<Rectangle>();
@@ -114,6 +124,10 @@ public class GameScreen implements Screen {
 
     }
 
+
+    /**
+     * สร้างระเบิด
+     */
     private void spawnbomb() {
 
         if (i<1){
@@ -154,14 +168,9 @@ public class GameScreen implements Screen {
         enemys.add(enemy);
     }
 
-    private void spawnBblock(int x,int y){
-        Rectangle Bblock = new Rectangle();
-        Bblock.x = x;
-        Bblock.y = y;
-        Bblock.width = 64;
-        Bblock.height = 64;
-        Bblocks.add(Bblock);
-    }
+
+
+
 
 
 
@@ -170,50 +179,92 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
-
+        ublockslist = new Array<Ublock>();
+        batch = new SpriteBatch();
         spawnenemy(200,200);
         spawnenemy(500,500);
+        //ublock.setPosition(50,50);
 
-        for (int i=0;i<16;i++) {
-            for (int j = 0; j < 20; j++) {
-                if (this.map[i][j] == 1){
-                    spawnBblock(64 * j, (1024-64 - (i * 64)));
-                }else if (this.map[i][j] == 0){
-
-                }
-
-            }
-        }
+//        for (int i=0;i<16;i++) {
+//            for (int j = 0; j < 20; j++) {
+//                if (this.map[i][j] == 1){
+//                    ublock = new Ublock();
+//                    ublock.draw(batch);
+//                    ublock.setPosition(64*j,(1024-64-(i*64)));
+//                  //  spawnBblock(64 * j, (1024-64 - (i * 64)));
+//                }else if (this.map[i][j] == 0){
+//
+//                }
+//
+//            }
+//        }
     }
 
     @Override
     public void render(float delta) {
+
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         camera.update();
-        game.batch.setProjectionMatrix(camera.combined);
+        batch.setProjectionMatrix(camera.combined);
 
 
-        game.batch.begin();
+        batch.begin();
 
-        game.batch.draw(bg,0,0);
-        game.batch.draw(ManImg,Man.x, Man.y,Man.width,Man.height);
+        batch.draw(bg,0,0);
+
+
+        while(k<16) {
+            while(l<20) {
+                if (this.map[k][l] == 1){
+                   ublockslist.add(new Ublock(64*l,1024-64-(k*64)));
+                   // System.out.println(64*l+"  "+(1024-64-(k*64)));
+                   l++;
+
+
+                    //  spawnBblock(64 * j, (1024-64 - (i * 64)));
+                }else if (this.map[k][l] == 0){
+                    l++;
+                }
+
+            }
+            k++;
+            l=0;
+        }
+
+        Rectangle Manrec = new Rectangle(Man.x,Man.y,Man.width,Man.height);
+
+        for (Ublock ublock : ublockslist) {
+            ublock.Draw(batch);
+            if (Manrec.overlaps(ublock.rectangle())){
+                Man.setPosition(ublock.getX()+ublock.getWidth(),Man.getY());
+             //   Man.y = Man.y;
+            }
+        }
+
+
+
+
+
+
+
+        batch.draw(ManImg,Man.x, Man.y,Man.width,Man.height);
         for(Rectangle bomb: bombs) {
-            game.batch.draw(BombImg, bomb.x, bomb.y,bomb.width,bomb.height);
+            batch.draw(BombImg, bomb.x, bomb.y,bomb.width,bomb.height);
         }
         for(Rectangle boom: booms) {
-            game.batch.draw(BoomImg, boom.x, boom.y,boom.width,boom.height);
+            batch.draw(BoomImg, boom.x, boom.y,boom.width,boom.height);
         }
 
         for(Rectangle enemy: enemys) {
-            game.batch.draw(EnemyImg, enemy.x, enemy.y,enemy.width,enemy.height);
+            batch.draw(EnemyImg, enemy.x, enemy.y,enemy.width,enemy.height);
         }
 
         for (Rectangle Bblock : Bblocks){
-            game.batch.draw(BblockImg,Bblock.x,Bblock.y,Bblock.width,Bblock.height);
+            batch.draw(BblockImg,Bblock.x,Bblock.y,Bblock.width,Bblock.height);
         }
 
-        game.batch.end();
+        batch.end();
 
         if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) {
 
@@ -329,7 +380,16 @@ public class GameScreen implements Screen {
             }
         }
 
+        /*
+        for(Rectangle Bblock : Bblocks){
+            Rectangle manrec = new Rectangle(Man.x,Man.y,Man.width,Man.height);
+            if(manrec.overlaps(spawnBblock(Bblock.x,Bblock.y))){
+                System.out.println("Hit!!!!!!!!!");
+            }
+        }
 
+
+         */
 
 
 

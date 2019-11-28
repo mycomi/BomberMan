@@ -1,6 +1,5 @@
 package com.bomberman.game;
 
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -43,6 +42,7 @@ public class MainMenuScreen implements Screen {
             public void clicked(InputEvent event,float x,float y){
                 super.clicked(event,x,y);
                 game.setScreen(new GameScreen(game));
+               // game.setScreen(new GameScreen());
             }
         });
 
