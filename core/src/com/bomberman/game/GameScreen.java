@@ -11,11 +11,19 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
+import javafx.scene.input.Mnemonic;
 import sun.rmi.runtime.Log;
 
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -24,18 +32,24 @@ public class GameScreen implements Screen {
     final BomberMan game;
     private Stage stage;
 
+    private GameScreen layer;
+
+
     OrthographicCamera camera;
     Texture ManImg;
     Texture bg;
     Texture BombImg;
     Texture BoomImg;
     Texture EnemyImg;
+    Texture BblockImg;
+    Texture UblockImg;
     Rectangle Man;
 
 
     Array<Rectangle> bombs;
     Array<Rectangle> booms;
 
+    LinkedList<Rectangle> Bblocks;
     LinkedList<Rectangle> enemys;
 
 
@@ -46,6 +60,26 @@ public class GameScreen implements Screen {
     int j=0;
     int boomX;
     int boomY;
+    int[][] map = {
+            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+
+    };
+
 
 
 
@@ -57,6 +91,7 @@ public class GameScreen implements Screen {
         BoomImg = new Texture("boom.png");
         bg = new Texture("bg.png");
         EnemyImg = new Texture("enemy.png");
+        BblockImg = new Texture("block.png");
 
 
         camera = new OrthographicCamera();
@@ -65,14 +100,15 @@ public class GameScreen implements Screen {
         Gdx.input.setInputProcessor(stage);
 
         Man = new Rectangle();
-        Man.x = 0;
-        Man.y = 0;
+        Man.x = 64;
+        Man.y = 64;
         Man.width = 64;
         Man.height = 64;
 
         bombs = new Array<Rectangle>();
         booms = new Array<Rectangle>();
 
+        Bblocks = new LinkedList<Rectangle>();
         enemys = new LinkedList<Rectangle>();
 
 
@@ -118,12 +154,36 @@ public class GameScreen implements Screen {
         enemys.add(enemy);
     }
 
+    private void spawnBblock(int x,int y){
+        Rectangle Bblock = new Rectangle();
+        Bblock.x = x;
+        Bblock.y = y;
+        Bblock.width = 64;
+        Bblock.height = 64;
+        Bblocks.add(Bblock);
+    }
+
+
+
+
+
 
     @Override
     public void show() {
 
         spawnenemy(200,200);
         spawnenemy(500,500);
+
+        for (int i=0;i<16;i++) {
+            for (int j = 0; j < 20; j++) {
+                if (this.map[i][j] == 1){
+                    spawnBblock(64 * j, (1024-64 - (i * 64)));
+                }else if (this.map[i][j] == 0){
+
+                }
+
+            }
+        }
     }
 
     @Override
@@ -132,6 +192,7 @@ public class GameScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
+
 
         game.batch.begin();
 
@@ -148,13 +209,17 @@ public class GameScreen implements Screen {
             game.batch.draw(EnemyImg, enemy.x, enemy.y,enemy.width,enemy.height);
         }
 
+        for (Rectangle Bblock : Bblocks){
+            game.batch.draw(BblockImg,Bblock.x,Bblock.y,Bblock.width,Bblock.height);
+        }
+
         game.batch.end();
 
-        Gdx.app.log("LOG","Boom Time: " + boomstime +"Bomb Time: "+ bombstime +"TimeUnit: "+TimeUtils.nanoTime());
-
-
         if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) {
+
             Man.y += 500 * Gdx.graphics.getDeltaTime();
+
+
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
@@ -168,6 +233,7 @@ public class GameScreen implements Screen {
         if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             Man.x += 500 * Gdx.graphics.getDeltaTime();
         }
+
 
         if(Man.x < 0) Man.x = 0;
         if(Man.x+64 > 1280) Man.x = 1280-64;
@@ -197,9 +263,33 @@ public class GameScreen implements Screen {
                 enemy.x -= 200*Gdx.graphics.getDeltaTime();
             }
 
+            for (Rectangle boom: booms){
+                if(((enemy.y >= boom.y)&&(enemy.y <= boom.y+64)) || ((enemy.y+64 >= boom.y)&&(enemy.y+64 <= boom.y+64))){
+
+                    if ((enemy.x+64 >= boom.x)&&(enemy.x<= boom.x+64)){
+                        enemys.remove(enemy);
+                    }
+                }
+
+            }
+
         }
 
+        for (Rectangle boom:booms){
 
+            if(((Man.y >= boom.y)&&(Man.y <= boom.y+64)) || ((Man.y+64 >= boom.y)&&(Man.y+64 <= boom.y+64))){
+
+                if ((Man.x+64 >= boom.x)&&(Man.x<= boom.x+64)){
+                    game.setScreen(new GameoverScreen(game));
+                }
+            }
+
+        }
+
+        for (Rectangle Bblock:Bblocks){
+
+
+        }
 
 
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE)){
@@ -224,8 +314,8 @@ public class GameScreen implements Screen {
                 spawnboom(0,0);
 
 
-                iter.remove();
 
+                iter.remove();
 
             }
 
@@ -234,10 +324,13 @@ public class GameScreen implements Screen {
         Iterator<Rectangle> iter2 = booms.iterator();
         while (iter2.hasNext()){
             Rectangle boom = iter2.next();
-            if (TimeUtils.nanoTime() - boomstime  > 1000000000){
+            if (TimeUtils.nanoTime() - boomstime  > 500000000){
                 iter2.remove();
             }
         }
+
+
+
 
 
 
