@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Mesh;
+
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -13,20 +13,11 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.math.Rectangle;
+import com.bomberman.game.object.Player;
 import com.bomberman.game.object.Ublock;
-import javafx.scene.input.Mnemonic;
-import sun.rmi.runtime.Log;
+import com.sun.tools.javac.comp.Check;
 
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -37,17 +28,16 @@ public class GameScreen implements Screen {
 
     private GameScreen layer;
 
-    private  Ublock ublock;
+    private Ublock ublock;
+    private Player player;
+
     SpriteBatch batch;
     OrthographicCamera camera;
-    Texture ManImg;
     Texture bg;
     Texture BombImg;
     Texture BoomImg;
     Texture EnemyImg;
     Texture BblockImg;
-    Texture UblockImg;
-    Rectangle Man;
 
 
     Array<Rectangle> bombs;
@@ -60,14 +50,20 @@ public class GameScreen implements Screen {
     long bombstime;
     long boomstime;
 
-    int i=0;
-    int j=0;
+    float i=0;
+    float j=0;
+
     int k = 0;
     int l = 0;
-    int x = 0;
-    int y = 0;
+
+    float x = 300;
+    float y = 600;
+
     float boomX;
     float boomY;
+
+    boolean moveableW =true ,moveableA = true,moveableS = true ,moveableD = true;
+
     int[][] map = {
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
@@ -94,7 +90,6 @@ public class GameScreen implements Screen {
     public GameScreen(final BomberMan gam) {
         this.game = gam;
 
-        ManImg = new Texture("hero.png");
         BombImg = new Texture("bomb.png");
         BoomImg = new Texture("boom.png");
         bg = new Texture("bg.png");
@@ -106,12 +101,6 @@ public class GameScreen implements Screen {
         camera.setToOrtho(false, 1280, 1024);
         stage = new Stage(new StretchViewport(1280, 1024));
         Gdx.input.setInputProcessor(stage);
-
-        Man = new Rectangle();
-        Man.x = 300;
-        Man.y = 300;
-        Man.width = 64;
-        Man.height = 64;
 
 
 
@@ -132,8 +121,8 @@ public class GameScreen implements Screen {
 
         if (i<1){
             Rectangle bomb = new Rectangle();
-            bomb.x = Man.x;
-            bomb.y = Man.y;
+            bomb.x = player.getX();
+            bomb.y = player.getY();
             bomb.width = 64;
             bomb.height = 64;
             bombs.add(bomb);
@@ -169,8 +158,73 @@ public class GameScreen implements Screen {
     }
 
 
+    private void checkCollisions(Rectangle player, Rectangle ublock){
+
+        if (player.overlaps(ublock)){
+            if(player.getX() + 64 > ublock.getX() && player.getX() < ublock.getX()){
+                //collision with right side of bucket
+
+                moveableD = false;
+                moveableA = true;
+
+            }
+
+            if(player.getX() < ublock.x + 64 && player.getX() > ublock.x){
+                //collision with left side of bucket
+
+                moveableA = false;
+
+            }
+
+            if(player.getY() + 64 > ublock.y && player.getY() < ublock.y){
+                //collision with top side of bucket
+
+                moveableW = false;
+            }
+
+            if(player.getY() < ublock.y + 64 && player.getY() > ublock.y){
+                //collision with bottom side of bucket
+
+                moveableS = false;
+
+            }
+
+        }
+
+    }
 
 
+/* private void checkCollisions(Rectangle player, Rectangle ublock){
+
+        if (player.overlaps(ublock)){
+            if(player.getX() + 64 > ublock.x && player.getX() < ublock.x){
+                //collision with right side of bucket
+                moveableD = false;
+
+            }
+            if(player.getX() < ublock.x + 64 && player.getX() > ublock.x){
+                //collision with left side of bucket
+                moveableA = false;
+
+
+            }
+
+            if(player.getY() + 64 > ublock.y && player.getY() < ublock.y){
+                //collision with top side of bucket
+                moveableW = false;
+
+            }
+            if(player.getY() < ublock.y + 64 && player.getY() > ublock.y){
+                //collision with bottom side of bucket
+                moveableS = false;
+
+
+            }
+
+        }
+    }
+
+ */
 
 
 
@@ -183,21 +237,23 @@ public class GameScreen implements Screen {
         batch = new SpriteBatch();
         spawnenemy(200,200);
         spawnenemy(500,500);
-        //ublock.setPosition(50,50);
 
-//        for (int i=0;i<16;i++) {
-//            for (int j = 0; j < 20; j++) {
-//                if (this.map[i][j] == 1){
-//                    ublock = new Ublock();
-//                    ublock.draw(batch);
-//                    ublock.setPosition(64*j,(1024-64-(i*64)));
-//                  //  spawnBblock(64 * j, (1024-64 - (i * 64)));
-//                }else if (this.map[i][j] == 0){
-//
-//                }
-//
-//            }
-//        }
+
+
+        while(k<16) {
+            while(l<20) {
+                if (this.map[k][l] == 1){
+                    ublockslist.add(new Ublock(64*l,1024-64-(k*64)));
+                    l++;
+
+                }else if (this.map[k][l] == 0){
+                    l++;
+                }
+
+            }
+            k++;
+            l=0;
+        }
     }
 
     @Override
@@ -208,47 +264,51 @@ public class GameScreen implements Screen {
         camera.update();
         batch.setProjectionMatrix(camera.combined);
 
+        player = new Player(x,y);
+
+
+
 
         batch.begin();
 
         batch.draw(bg,0,0);
 
 
-        while(k<16) {
-            while(l<20) {
-                if (this.map[k][l] == 1){
-                   ublockslist.add(new Ublock(64*l,1024-64-(k*64)));
-                   // System.out.println(64*l+"  "+(1024-64-(k*64)));
-                   l++;
-
-
-                    //  spawnBblock(64 * j, (1024-64 - (i * 64)));
-                }else if (this.map[k][l] == 0){
-                    l++;
-                }
-
-            }
-            k++;
-            l=0;
-        }
-
-        Rectangle Manrec = new Rectangle(Man.x,Man.y,Man.width,Man.height);
+      /*  Rectangle Manrec = new Rectangle(player.getX(),player.getY(),player.getWidth(),player.getHeight());
 
         for (Ublock ublock : ublockslist) {
             ublock.Draw(batch);
             if (Manrec.overlaps(ublock.rectangle())){
-                Man.setPosition(ublock.getX()+ublock.getWidth(),Man.getY());
-             //   Man.y = Man.y;
+                if(player.getX() + 64 > ublock.getX() && player.getX() < ublock.getX()){
+                    //collision with right side of bucket
+                }
+                if(player.getX() < ublock.getX() + 64 && player.getX() > ublock.getX()){
+                    //collision with left side of bucket
+                }
+                if(player.getY() + 64 > ublock.getY() && player.getY() < ublock.getY()){
+                    //collision with top side of bucket
+                }
+                if(player.getY() < ublock.getY() + 64 && player.getY() > ublock.getY()){
+                    //collision with bottom side of bucket
+                }
+
             }
+        }
+
+        */
+
+        for (Ublock ublock : ublockslist) {
+            ublock.Draw(batch);
+
+            checkCollisions(player.rectangle(),ublock.rectangle());
+
         }
 
 
 
+        player.Draw(batch);
 
 
-
-
-        batch.draw(ManImg,Man.x, Man.y,Man.width,Man.height);
         for(Rectangle bomb: bombs) {
             batch.draw(BombImg, bomb.x, bomb.y,bomb.width,bomb.height);
         }
@@ -268,37 +328,54 @@ public class GameScreen implements Screen {
 
         if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) {
 
-            Man.y += 500 * Gdx.graphics.getDeltaTime();
-
+            if (moveableW == true)
+            y += 500 * Gdx.graphics.getDeltaTime();
 
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            Man.x -= 500 * Gdx.graphics.getDeltaTime();
+
+            if (moveableA == true)
+            x -= 500 * Gdx.graphics.getDeltaTime();
+
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            Man.y -= 500 * Gdx.graphics.getDeltaTime();
+
+            if (moveableS == true)
+            y -= 500 * Gdx.graphics.getDeltaTime();
+
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            Man.x += 500 * Gdx.graphics.getDeltaTime();
+
+            if (moveableD == true){
+                x += 500 * Gdx.graphics.getDeltaTime();
+            }
+
+
         }
 
 
-        if(Man.x < 0) Man.x = 0;
-        if(Man.x+64 > 1280) Man.x = 1280-64;
 
-        if(Man.y < 0) Man.y = 0;
-        if(Man.y+64 > 1024) Man.y = 1024-64;
+
+        if(player.getX() < 0) x = 0;
+        if(player.getX()+64 > 1280) x = 1280-64;
+
+        if(player.getY() < 0) y = 0;
+        if(player.getY()+64 > 1024) y = 1024-64;
+
+
 
         for(Rectangle enemy: enemys) {
-            if(((Man.y >= enemy.y)&&(Man.y <= enemy.y+64)) || ((Man.y+64 >= enemy.y)&&(Man.y+64 <= enemy.y+64))){
+            if(((player.getY() >= enemy.y)&&(player.getY() <= enemy.y+64)) || ((player.getY()+64 >= enemy.y)&&(player.getY()+64 <= enemy.y+64))){
 
-                if ((Man.x+64 >= enemy.x)&&(Man.x<= enemy.x+64)){
+                if ((player.getX()+64 >= enemy.x)&&(player.getX()<= enemy.x+64)){
                     game.setScreen(new GameoverScreen(game));
                 }
             }
+
+
 
             if (j < 1){
                 if (enemy.x+64 > 1200){
@@ -326,18 +403,21 @@ public class GameScreen implements Screen {
 
         }
 
-        for (Rectangle boom:booms){
+       for (Rectangle boom:booms){
 
-            if(((Man.y >= boom.y)&&(Man.y <= boom.y+64)) || ((Man.y+64 >= boom.y)&&(Man.y+64 <= boom.y+64))){
+            if(((player.getY() >= boom.y)&&(player.getY() <= boom.y+64)) || ((player.getY()+64 >= boom.y)&&(player.getY()+64 <= boom.y+64))){
 
-                if ((Man.x+64 >= boom.x)&&(Man.x<= boom.x+64)){
+                if ((player.getX()+64 >= boom.x)&&(player.getX()<= boom.x+64)){
                     game.setScreen(new GameoverScreen(game));
                 }
             }
 
         }
 
+
+
         for (Rectangle Bblock:Bblocks){
+
 
 
         }
@@ -421,3 +501,7 @@ public class GameScreen implements Screen {
 
     }
 }
+
+
+
+

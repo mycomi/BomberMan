@@ -4,12 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
-import com.bomberman.game.GameScreen;
 
-public class Ublock {
-
+public class Player {
 
     Sprite sprite;
     Texture texture;
@@ -18,10 +15,10 @@ public class Ublock {
 
 
 
-    public Ublock(float x,float y) {
+    public Player(float x,float y) {
         //Constructor
 
-        texture = new Texture(Gdx.files.internal("block.png"));
+        texture = new Texture(Gdx.files.internal("hero.png"));
         sprite = new Sprite(texture);
         sprite.setPosition(x, y);
         sprite.setSize(64, 64);
@@ -58,11 +55,8 @@ public class Ublock {
     }
 
 
-
-
     public void Draw(SpriteBatch batch) {
         sprite.draw(batch);
     }
-
 
 }
