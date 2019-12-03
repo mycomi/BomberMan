@@ -21,7 +21,7 @@ public class Ublock {
     public Ublock(float x,float y) {
         //Constructor
 
-        texture = new Texture(Gdx.files.internal("block.png"));
+        texture = new Texture(Gdx.files.internal("Ublock.png"));
         sprite = new Sprite(texture);
         sprite.setPosition(x, y);
         sprite.setSize(64, 64);

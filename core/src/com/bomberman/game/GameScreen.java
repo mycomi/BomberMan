@@ -28,6 +28,7 @@ public class GameScreen implements Screen {
     private GameScreen layer;
 
     private Ublock ublock;
+    private Bblock bblock;
     private Player player;
     private Enemy enemy;
     private Bomb bomb;
@@ -36,16 +37,13 @@ public class GameScreen implements Screen {
     SpriteBatch batch;
     OrthographicCamera camera;
     Texture bg;
-    Texture BoomImg;
 
-    Texture BblockImg;
-
-    LinkedList<Rectangle> Bblocks;
 
     LinkedList<Enemy> enemys;
-    Array<Ublock> ublockslist;
-    Array<Bomb> bombs;
-    Array<Boom> booms;
+    LinkedList<Ublock> ublockslist;
+    LinkedList<Bblock> bblockslist;
+    LinkedList<Bomb> bombs;
+    LinkedList<Boom> booms;
 
     long bombstime;
     long boomstime;
@@ -58,20 +56,18 @@ public class GameScreen implements Screen {
 
     int bombN = 1;
 
-    float playerX = 300;
-    float playerY = 600;
+    float playerX = 64;
+    float playerY = 64;
 
-    float bombX , bombY;
+    float bombX =99999 , bombY =99999;
 
-    float boomX;
-    float boomY;
-
+    float boomX,boomY;
 
 
     int[][] map = {
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+            {1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,0,1},
             {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
             {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
             {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
@@ -80,8 +76,8 @@ public class GameScreen implements Screen {
             {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
             {1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1},
             {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,1},
             {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
             {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
@@ -94,19 +90,12 @@ public class GameScreen implements Screen {
     public GameScreen(final BomberMan gam) {
         this.game = gam;
 
-        BoomImg = new Texture("boom.png");
         bg = new Texture("bg.png");
-        BblockImg = new Texture("block.png");
-
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 1280, 1024);
         stage = new Stage(new StretchViewport(1280, 1024));
         Gdx.input.setInputProcessor(stage);
-
-
-        Bblocks = new LinkedList<Rectangle>();
-
 
 
     }
@@ -122,51 +111,43 @@ public class GameScreen implements Screen {
         if (player.overlaps(ublock)){
                 if(player.getX() + 64 > ublock.x && player.getX() < ublock.x){
                     //collision with right side of bucket
-
                     playerX = ublock.x - 64;
                     playerY = player.getY();
-
                 }
 
                 if(player.getX() < ublock.x + 64 && player.getX() > ublock.x){
                     //collision with left side of bucket
-
                     playerX = ublock.x + 64 ;
                     playerY = player.getY();
-
-
                 }
 
 
                 if(player.getY() + 64 > ublock.y && player.getY() < ublock.y){
                     //collision with top side of bucket
-
                     playerY = ublock.y - 64;
                     playerX = player.getX();
-
                 }
 
                 if(player.getY() < ublock.y + 64 && player.getY() > ublock.y){
                     //collision with bottom side of bucket
-
                     playerY = ublock.y + 64;
                     playerX = player.getX();
-
-
                 }
-
-
         }
-
     }
 
 
 
     @Override
     public void show() {
-        ublockslist = new Array<Ublock>();
+        ublockslist = new LinkedList<>();
+        bblockslist = new LinkedList<>();
         batch = new SpriteBatch();
 
+        enemys = new LinkedList<>();
+
+        enemys.add(new Enemy(200,500));
+        enemys.add(new Enemy(500,400));
 
         while(k<16) {
             while(l<20) {
@@ -176,12 +157,17 @@ public class GameScreen implements Screen {
 
                 }else if (this.map[k][l] == 0){
                     l++;
+                }else if (this.map[k][l] == 2){
+                    bblockslist.add(new Bblock(64*l,1024-64-(k*64)));
+                    l++;
                 }
 
             }
             k++;
             l=0;
         }
+
+
     }
 
     @Override
@@ -194,16 +180,11 @@ public class GameScreen implements Screen {
 
         player = new Player(playerX,playerY);
 
-        enemys = new LinkedList<>();
 
-        enemys.add(new Enemy(200,500));
-        enemys.add(new Enemy(500,400));
-
-        bombs = new Array<Bomb>();
-        booms = new Array<Boom>();
+        bombs = new LinkedList<>();
+        booms = new LinkedList<>();
 
         bombs.add(new Bomb(bombX,bombY));
-
 
         batch.begin();
 
@@ -217,32 +198,50 @@ public class GameScreen implements Screen {
 
         }
 
-        for (Enemy enemy : enemys){
-            enemy.Draw(batch);
+        for (Bblock bblock : bblockslist) {
+            bblock.Draw(batch);
+
         }
 
+        for (Enemy enemy : enemys){
+            enemy.Draw(batch);
+
+        }
+
+        for (Bomb bomb : bombs){
+            bomb.Draw(batch);
+
+        }
+
+        for (Boom boom : booms){
+            boom.Draw(batch);
+        }
 
         player.Draw(batch);
 
-        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)){
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
+
             if (bombN == 1){
+                bombstime = TimeUtils.nanoTime();
                 bombX = playerX;
                 bombY = playerY;
-                bombstime = TimeUtils.nanoTime();
                 bombN = 0;
             }
 
         }
 
 
-        for (Bomb bomb : bombs){
-            bomb.Draw(batch);
-            if (TimeUtils.nanoTime() - bombstime > 2000000000){
-                bombs.removeAll(bombs,true);
-                bombN = 1;
-            }
 
+        if (TimeUtils.nanoTime() - bombstime > 2000000000){
+            bombN = 1;
+
+            booms.add(new Boom(bombX,bombY+64));
+            booms.add(new Boom(bombX,bombY-64));
+            booms.add(new Boom(bombX+64,bombY));
+            booms.add(new Boom(bombX-64,bombY));
         }
+
+
 
 
 
@@ -251,11 +250,6 @@ public class GameScreen implements Screen {
 
 
 
-
-
-        for (Rectangle Bblock : Bblocks){
-            batch.draw(BblockImg,Bblock.x,Bblock.y,Bblock.width,Bblock.height);
-        }
 
         batch.end();
 
@@ -318,6 +312,7 @@ public class GameScreen implements Screen {
 
             }
 
+
         }
 
        for (Boom boom:booms){
@@ -330,20 +325,6 @@ public class GameScreen implements Screen {
             }
 
         }
-
-
-
-        /*
-        for(Rectangle Bblock : Bblocks){
-            Rectangle manrec = new Rectangle(Man.x,Man.y,Man.width,Man.height);
-            if(manrec.overlaps(spawnBblock(Bblock.x,Bblock.y))){
-                System.out.println("Hit!!!!!!!!!");
-            }
-        }
-
-
-         */
-
 
 
 

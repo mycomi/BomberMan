@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 
-public class Enemy {
+public class Bblock {
 
     Sprite sprite;
     Texture texture;
@@ -15,14 +15,13 @@ public class Enemy {
 
 
 
-    public Enemy(float x,float y) {
+    public Bblock(float x,float y) {
         //Constructor
 
-        texture = new Texture(Gdx.files.internal("enemy.png"));
+        texture = new Texture(Gdx.files.internal("Bblock.png"));
         sprite = new Sprite(texture);
         sprite.setPosition(x, y);
         sprite.setSize(64, 64);
-
     }
 
 
@@ -56,9 +55,7 @@ public class Enemy {
     }
 
 
-
     public void Draw(SpriteBatch batch) {
         sprite.draw(batch);
     }
-
 }

@@ -4,6 +4,8 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -17,11 +19,16 @@ public class MainMenuScreen implements Screen {
 
     OrthographicCamera camera;
 
+
     private Stage stage;
     private Skin skin;
+    SpriteBatch batch;
+    Texture bg;
+
 
     public MainMenuScreen(final BomberMan gam) {
         game = gam;
+        bg = new Texture("bg.jpg");
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 1280, 1024);
@@ -51,6 +58,7 @@ public class MainMenuScreen implements Screen {
     @Override
     public void show() {
 
+
     }
 
     @Override
@@ -59,6 +67,11 @@ public class MainMenuScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         stage.act(Gdx.graphics.getDeltaTime());
+        batch = new SpriteBatch();
+
+        batch.begin();
+        batch.draw(bg,0,0);
+        batch.end();
         stage.draw();
 
 

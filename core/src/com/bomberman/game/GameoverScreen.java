@@ -5,6 +5,8 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -20,10 +22,13 @@ public class GameoverScreen implements Screen {
 
     private Stage stage;
     private Skin skin;
+    SpriteBatch batch;
+    Texture bg;
 
     public GameoverScreen(final BomberMan gam) {
         game = gam;
 
+        bg = new Texture("gameover.jpg");
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 1280, 1024);
 
@@ -35,7 +40,7 @@ public class GameoverScreen implements Screen {
         TextButton buttonStart = new TextButton("Restart",skin);
         buttonStart.setWidth(200);
         buttonStart.setHeight(50);
-        buttonStart.setPosition(1280/2-200/2,500);
+        buttonStart.setPosition(1280/2-200/2,300);
         stage.addActor(buttonStart);
 
         buttonStart.addListener(new ClickListener(){
@@ -60,16 +65,18 @@ public class GameoverScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         stage.act(Gdx.graphics.getDeltaTime());
-        stage.draw();
+
 
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
 
-        game.batch.begin();
-        game.font.draw(game.batch, "Game Over ", 450, 800);
-        game.font.getData().setScale(5,5);
+        batch = new SpriteBatch();
 
-        game.batch.end();
+        batch.begin();
+        batch.draw(bg,0,0);
+
+        batch.end();
+        stage.draw();
 
    /*     if (Gdx.input.isKeyPressed(Input.Keys.ENTER)) {
             game.setScreen(new GameScreen(game));
@@ -105,6 +112,9 @@ public class GameoverScreen implements Screen {
 
     @Override
     public void dispose() {
+        batch.dispose();
+        stage.dispose();
+        game.dispose();
 
     }
 }
