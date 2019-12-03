@@ -8,11 +8,14 @@ import com.badlogic.gdx.math.Rectangle;
 
 public class Enemy {
 
+    public boolean move_left = true;
+    float speed ;
     Sprite sprite;
     Texture texture;
     float x,y,width,height;
-
-
+    public boolean move_Left(boolean move_left){
+        return this.move_left = move_left;
+    }
 
 
     public Enemy(float x,float y) {
@@ -22,13 +25,31 @@ public class Enemy {
         sprite = new Sprite(texture);
         sprite.setPosition(x, y);
         sprite.setSize(64, 64);
-
+        speed = 250f;
     }
 
 
     public void setPosition(float x,float y) {
         //Set position of object
         sprite.setPosition(x, y);
+    }
+
+
+
+    public void Move(float delta){
+        if(move_Left(move_left) == true){
+            sprite.setX(sprite.getX()+(speed*delta));
+            if(sprite.getX() > Gdx.graphics.getWidth() ){
+                //move_left = false;
+                this.move_Left(false);
+            }
+        }else if (move_Left(move_left) == false){
+            sprite.setX(sprite.getX()-(speed*delta));
+            if(sprite.getX() < 0 ){
+                //move_left = true;
+                this.move_Left(true);
+            }
+        }
     }
 
     public Rectangle rectangle(){
@@ -54,8 +75,6 @@ public class Enemy {
         float width = sprite.getWidth();
         return width;
     }
-
-
 
     public void Draw(SpriteBatch batch) {
         sprite.draw(batch);

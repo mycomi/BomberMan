@@ -53,6 +53,22 @@ public class MainMenuScreen implements Screen {
             }
         });
 
+        TextButton buttonExit = new TextButton("Exit",skin);
+        buttonExit.setWidth(200);
+        buttonExit.setHeight(50);
+        buttonExit.setPosition(1280/2-200/2,250);
+        stage.addActor(buttonExit);
+
+        buttonExit.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event,float x,float y){
+                super.clicked(event,x,y);
+                Gdx.app.exit();
+                // game.setScreen(new GameScreen());
+            }
+        });
+
+
     }
 
     @Override

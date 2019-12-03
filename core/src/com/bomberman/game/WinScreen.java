@@ -1,7 +1,6 @@
 package com.bomberman.game;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -14,8 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 
-public class GameoverScreen implements Screen {
-
+public class WinScreen implements Screen {
     final BomberMan game;
 
     OrthographicCamera camera;
@@ -25,7 +23,7 @@ public class GameoverScreen implements Screen {
     SpriteBatch batch;
     Texture bg;
 
-    public GameoverScreen(final BomberMan gam) {
+    public WinScreen(final BomberMan gam) {
         game = gam;
 
         bg = new Texture("gameover.jpg");
@@ -37,7 +35,7 @@ public class GameoverScreen implements Screen {
 
         skin = new Skin(Gdx.files.internal("uiskin.json"));
 
-        TextButton buttonStart = new TextButton("Restart",skin);
+        TextButton buttonStart = new TextButton("Play again",skin);
         buttonStart.setWidth(200);
         buttonStart.setHeight(50);
         buttonStart.setPosition(1280/2-200/2,700);
@@ -45,7 +43,7 @@ public class GameoverScreen implements Screen {
 
         buttonStart.addListener(new ClickListener(){
             @Override
-            public void clicked(InputEvent event,float x,float y){
+            public void clicked(InputEvent event, float x, float y){
                 super.clicked(event,x,y);
                 game.setScreen(new GameScreen(game));
             }

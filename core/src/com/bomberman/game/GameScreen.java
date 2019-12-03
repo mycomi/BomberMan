@@ -56,8 +56,8 @@ public class GameScreen implements Screen {
 
     int bombN = 1;
     float time = 0f;
-    float playerX = 100;
-    float playerY = 100;
+    float playerX = 65;
+    float playerY = 1024-65;
 
     float tempX=9999,tempY=9999;
 
@@ -70,20 +70,20 @@ public class GameScreen implements Screen {
 
     int[][] map = {
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+            {1,0,0,0,2,0,0,2,0,2,2,0,2,2,2,2,0,0,0,1},
+            {1,0,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,2,1},
+            {1,0,2,2,2,2,0,2,0,2,2,2,0,0,0,2,2,2,2,1},
+            {1,0,1,2,1,2,1,2,1,2,1,0,1,0,1,0,1,2,0,1},
+            {1,0,2,2,2,2,0,0,0,0,0,0,2,2,2,0,0,0,0,1},
+            {1,0,1,0,1,0,1,0,1,0,1,2,1,2,1,2,1,2,2,1},
+            {1,0,0,2,2,0,0,0,0,0,0,0,2,2,2,0,0,2,0,1},
+            {1,0,1,2,1,0,1,2,1,0,1,0,1,0,1,0,1,2,0,1},
+            {1,0,0,2,2,0,2,2,2,0,2,0,0,0,2,2,2,0,0,1},
+            {1,0,1,2,1,0,1,0,1,0,1,2,1,0,1,2,1,0,0,1},
+            {1,0,2,2,2,0,0,0,0,2,2,2,2,2,0,0,0,0,0,1},
+            {1,0,1,2,1,0,1,2,1,0,1,2,1,0,1,0,1,0,0,1},
+            {1,0,0,0,0,0,2,2,2,0,2,2,2,0,0,0,0,0,0,1},
+            {1,0,1,0,1,0,1,2,1,0,1,2,1,0,1,0,1,0,0,1},
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
 
     };
@@ -110,39 +110,35 @@ public class GameScreen implements Screen {
      */
 
 
-public void Removebomb(){
-
-}
-
-    private void checkPUb(Rectangle player, Rectangle ublock){
+    private void checkCollision (Rectangle player, Rectangle block){
 
 
-        if (player.overlaps(ublock)){
-                if(player.getX() + 64 > ublock.x && player.getX() < ublock.x){
+        if (player.overlaps(block)){
+                if(player.getX() + 64 > block.x && player.getX() < block.x){
                     //collision with right side of bucket
-                    playerX = ublock.x - 64;
+                    playerX = block.x - 64;
                     playerY = player.getY();
          //           moveableD = false;
                 }
 
-                if(player.getX() < ublock.x + 64 && player.getX() > ublock.x){
+                if(player.getX() < block.x + 64 && player.getX() > block.x){
                     //collision with left side of bucket
-                    playerX = ublock.x + 64 ;
+                    playerX = block.x + 64 ;
                     playerY = player.getY();
       //              moveableA = false;
                 }
 
 
-                if(player.getY() + 64 > ublock.y && player.getY() < ublock.y){
+                if(player.getY() + 64 > block.y && player.getY() < block.y){
                     //collision with top side of bucket
-                    playerY = ublock.y - 64;
+                    playerY = block.y - 64;
                     playerX = player.getX();
                  //   moveableW = false;
                 }
 
-                if(player.getY() < ublock.y + 64 && player.getY() > ublock.y){
+                if(player.getY() < block.y + 64 && player.getY() > block.y){
                     //collision with bottom side of bucket
-                    playerY = ublock.y + 64;
+                    playerY = block.y + 64;
                     playerX = player.getX();
                  //   moveableS = false;
                 }
@@ -193,7 +189,9 @@ public void Removebomb(){
         batch.setProjectionMatrix(camera.combined);
 
         player = new Player(playerX,playerY);
-
+        for (Enemy enemy : enemys){
+            enemy.Move(delta);
+        }
 
         bombs = new Array<Bomb>();
         booms = new LinkedList<Boom>();
@@ -205,13 +203,13 @@ public void Removebomb(){
 
         for (Ublock ublock : ublockslist) {
             ublock.Draw(batch);
-            checkPUb(player.rectangle(),ublock.rectangle());
-
+            checkCollision(player.rectangle(),ublock.rectangle());
 
         }
 
         for (Bblock bblock : bblockslist) {
             bblock.Draw(batch);
+            checkCollision(player.rectangle(),bblock.rectangle());
 
         }
 
@@ -267,6 +265,7 @@ public void Removebomb(){
         for (Boom boom : booms){
             boom.Draw(batch);
 
+
         }
 
         batch.end();
@@ -274,36 +273,36 @@ public void Removebomb(){
         if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) {
 
         //    if (moveableW == true)
-            playerY += 500 * Gdx.graphics.getDeltaTime();
+            playerY += 250 * Gdx.graphics.getDeltaTime();
 
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
 
          //   if (moveableA == true)
-            playerX -= 500 * Gdx.graphics.getDeltaTime();
+            playerX -= 250 * Gdx.graphics.getDeltaTime();
 
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
 
          //   if (moveableS == true)
-            playerY -= 500 * Gdx.graphics.getDeltaTime();
+            playerY -= 250 * Gdx.graphics.getDeltaTime();
 
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
 
          //   if (moveableD == true)
-                playerX += 500 * Gdx.graphics.getDeltaTime();
+                playerX += 250 * Gdx.graphics.getDeltaTime();
 
         }
 
-        if(player.getX() < 0) playerX = 0;
-        if(player.getX()+64 > 1280) playerX = 1280-64;
+        if(player.getX() < 64) playerX = 64;
+        if(player.getX()+64 > 1280-64) playerX = 1280-128;
 
-        if(player.getY() < 0) playerY = 0;
-        if(player.getY()+64 > 1024) playerY = 1024-64;
+        if(player.getY() < 64) playerY = 64;
+        if(player.getY()+64 > 1024-64) playerY = 1024-128;
 
 
 
@@ -324,6 +323,11 @@ public void Removebomb(){
                     }
                 }
 
+                if (enemys.isEmpty()){
+                    game.setScreen(new WinScreen(game));
+
+                }
+
             }
 
 
@@ -334,12 +338,24 @@ public void Removebomb(){
             if(((player.getY() >= boom.getY())&&(player.getY() <= boom.getY()+64)) || ((player.getY()+64 >= boom.getY())&&(player.getY()+64 <= boom.getY()+64))){
 
                 if ((player.getX()+64 >= boom.getX())&&(player.getX()<= boom.getX()+64)){
-                    game.setScreen(new GameoverScreen(game));
+                    game.setScreen(new GameScreen(game));
                 }
             }
 
-        }
+            try{
+                for (Bblock bblock : bblockslist){
+                    if(((bblock.getY() >= boom.getY())&&(bblock.getY() <= boom.getY()+64)) || ((bblock.getY()+64 >= boom.getY())&&(bblock.getY()+64 <= boom.getY()+64))){
 
+                        if ((bblock.getX()+64 >= boom.getX())&&(bblock.getX()<= boom.getX()+64)){
+                            bblockslist.remove(bblock);
+                        }
+                    }
+                }
+            }catch (Exception e){
+
+            }
+
+        }
 
 
     }

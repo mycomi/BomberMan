@@ -21,7 +21,7 @@ public class Player {
         texture = new Texture(Gdx.files.internal("hero.png"));
         sprite = new Sprite(texture);
         sprite.setPosition(x, y);
-        sprite.setSize(64, 64);
+        sprite.setSize(55, 55);
     }
 
 
