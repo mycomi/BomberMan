@@ -5,18 +5,17 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.utils.TimeUtils;
 
-public class Bomb {
+public class Boom {
     Sprite sprite;
     Texture texture;
     float x,y,width,height;
 
 
-    public Bomb(float x,float y) {
+    public Boom(float x,float y) {
         //Constructor
 
-        texture = new Texture(Gdx.files.internal("bomb.png"));
+        texture = new Texture(Gdx.files.internal("boom.png"));
         sprite = new Sprite(texture);
         sprite.setPosition(x, y);
         sprite.setSize(64, 64);
@@ -56,6 +55,4 @@ public class Bomb {
     public void Draw(SpriteBatch batch) {
         sprite.draw(batch);
     }
-
-
 }

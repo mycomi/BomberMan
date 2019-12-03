@@ -13,10 +13,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.math.Rectangle;
-import com.bomberman.game.object.Bomb;
-import com.bomberman.game.object.Enemy;
-import com.bomberman.game.object.Player;
-import com.bomberman.game.object.Ublock;
+import com.bomberman.game.object.*;
 import com.sun.tools.javac.comp.Check;
 
 
@@ -34,6 +31,7 @@ public class GameScreen implements Screen {
     private Player player;
     private Enemy enemy;
     private Bomb bomb;
+    private Boom boom;
 
     SpriteBatch batch;
     OrthographicCamera camera;
@@ -42,14 +40,12 @@ public class GameScreen implements Screen {
 
     Texture BblockImg;
 
-
-    Array<Rectangle> booms;
-
     LinkedList<Rectangle> Bblocks;
 
     LinkedList<Enemy> enemys;
     Array<Ublock> ublockslist;
     Array<Bomb> bombs;
+    Array<Boom> booms;
 
     long bombstime;
     long boomstime;
@@ -60,11 +56,16 @@ public class GameScreen implements Screen {
     int k = 0;
     int l = 0;
 
+    int bombN = 1;
+
     float playerX = 300;
     float playerY = 600;
 
+    float bombX , bombY;
+
     float boomX;
     float boomY;
+
 
 
     int[][] map = {
@@ -104,9 +105,6 @@ public class GameScreen implements Screen {
         Gdx.input.setInputProcessor(stage);
 
 
-
-        booms = new Array<Rectangle>();
-
         Bblocks = new LinkedList<Rectangle>();
 
 
@@ -117,20 +115,6 @@ public class GameScreen implements Screen {
     /**
      * สร้างระเบิด
      */
-
-
-    private void spawnboom(int x ,int y){
-        Rectangle boom = new Rectangle();
-        boom.x = boomX+x;
-        boom.y = boomY+y;
-        boom.width = 64;
-        boom.height = 64;
-        booms.add(boom);
-
-
-    }
-
-
 
 
     private void checkCollisions(Rectangle player, Rectangle ublock){
@@ -216,6 +200,9 @@ public class GameScreen implements Screen {
         enemys.add(new Enemy(500,400));
 
         bombs = new Array<Bomb>();
+        booms = new Array<Boom>();
+
+        bombs.add(new Bomb(bombX,bombY));
 
 
         batch.begin();
@@ -238,19 +225,31 @@ public class GameScreen implements Screen {
         player.Draw(batch);
 
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE)){
-            bombs.add(new Bomb(playerX,playerY));
-            bombstime = TimeUtils.nanoTime();
+            if (bombN == 1){
+                bombX = playerX;
+                bombY = playerY;
+                bombstime = TimeUtils.nanoTime();
+                bombN = 0;
+            }
 
         }
+
 
         for (Bomb bomb : bombs){
             bomb.Draw(batch);
+            if (TimeUtils.nanoTime() - bombstime > 2000000000){
+                bombs.removeAll(bombs,true);
+                bombN = 1;
+            }
+
         }
 
 
-        for(Rectangle boom: booms) {
-            batch.draw(BoomImg, boom.x, boom.y,boom.width,boom.height);
-        }
+
+
+        System.out.println("Bombtime :" + bombstime + "Time :" + TimeUtils.nanoTime());
+
+
 
 
 
@@ -309,13 +308,10 @@ public class GameScreen implements Screen {
             }
 
 
+            for (Boom boom: booms){
+                if(((enemy.getY() >= boom.getY())&&(enemy.getY() <= boom.getY()+64)) || ((enemy.getY()+64 >= boom.getY())&&(enemy.getY()+64 <= boom.getY()+64))){
 
-
-
-            for (Rectangle boom: booms){
-                if(((enemy.getY() >= boom.y)&&(enemy.getY() <= boom.y+64)) || ((enemy.getY()+64 >= boom.y)&&(enemy.getY()+64 <= boom.y+64))){
-
-                    if ((enemy.getY()+64 >= boom.x)&&(enemy.getY()<= boom.x+64)){
+                    if ((enemy.getY()+64 >= boom.getX())&&(enemy.getY()<= boom.getX()+64)){
                         enemys.remove(enemy);
                     }
                 }
@@ -324,11 +320,11 @@ public class GameScreen implements Screen {
 
         }
 
-       for (Rectangle boom:booms){
+       for (Boom boom:booms){
 
-            if(((player.getY() >= boom.y)&&(player.getY() <= boom.y+64)) || ((player.getY()+64 >= boom.y)&&(player.getY()+64 <= boom.y+64))){
+            if(((player.getY() >= boom.getY())&&(player.getY() <= boom.getY()+64)) || ((player.getY()+64 >= boom.getY())&&(player.getY()+64 <= boom.getY()+64))){
 
-                if ((player.getX()+64 >= boom.x)&&(player.getX()<= boom.x+64)){
+                if ((player.getX()+64 >= boom.getX())&&(player.getX()<= boom.getX()+64)){
                     game.setScreen(new GameoverScreen(game));
                 }
             }
@@ -336,33 +332,6 @@ public class GameScreen implements Screen {
         }
 
 
-
-
-
-        Iterator<Bomb> iter = bombs.iterator();
-        while (iter.hasNext()) {
-            bomb = iter.next();
-            if(TimeUtils.nanoTime() - bombstime > 2000000000) {
-                i = 0;
-                spawnboom(64,0);
-                spawnboom(-64,0);
-                spawnboom(0,64);
-                spawnboom(0,-64);
-                spawnboom(0,0);
-
-                iter.remove();
-
-            }
-
-        }
-
-        Iterator<Rectangle> iter2 = booms.iterator();
-        while (iter2.hasNext()){
-            Rectangle boom = iter2.next();
-            if (TimeUtils.nanoTime() - boomstime  > 500000000){
-                iter2.remove();
-            }
-        }
 
         /*
         for(Rectangle Bblock : Bblocks){
