@@ -59,6 +59,8 @@ public class GameScreen implements Screen {
     float playerX = 100;
     float playerY = 100;
 
+    float tempX=9999,tempY=9999;
+
     float bombX =99999 , bombY =99999;
 
     float boomX,boomY;
@@ -118,41 +120,34 @@ public void Removebomb(){
         if (player.overlaps(ublock)){
                 if(player.getX() + 64 > ublock.x && player.getX() < ublock.x){
                     //collision with right side of bucket
-//                    playerX = ublock.x - 64;
-//                    playerY = player.getY();
-                    moveableD = false;
+                    playerX = ublock.x - 64;
+                    playerY = player.getY();
+         //           moveableD = false;
                 }
 
                 if(player.getX() < ublock.x + 64 && player.getX() > ublock.x){
                     //collision with left side of bucket
-//                    playerX = ublock.x + 64 ;
-//                    playerY = player.getY();
-                    moveableA = false;
+                    playerX = ublock.x + 64 ;
+                    playerY = player.getY();
+      //              moveableA = false;
                 }
 
 
                 if(player.getY() + 64 > ublock.y && player.getY() < ublock.y){
                     //collision with top side of bucket
-//                    playerY = ublock.y - 64;
-//                    playerX = player.getX();
-                    moveableW = false;
+                    playerY = ublock.y - 64;
+                    playerX = player.getX();
+                 //   moveableW = false;
                 }
 
                 if(player.getY() < ublock.y + 64 && player.getY() > ublock.y){
                     //collision with bottom side of bucket
-//                    playerY = ublock.y + 64;
-//                    playerX = player.getX();
-                    moveableS = false;
+                    playerY = ublock.y + 64;
+                    playerX = player.getX();
+                 //   moveableS = false;
                 }
         }
     }
-
-    private void checkEB(Rectangle enemy,Rectangle boom){
-        if (enemy.overlaps(boom)){
-        }
-    }
-
-
 
 
     @Override
@@ -201,7 +196,7 @@ public void Removebomb(){
 
 
         bombs = new Array<Bomb>();
-        booms = new LinkedList<>();
+        booms = new LinkedList<Boom>();
 
         batch.begin();
 
@@ -222,7 +217,6 @@ public void Removebomb(){
 
         for (Enemy enemy : enemys){
             enemy.Draw(batch);
-
         }
 
         player.Draw(batch);
@@ -233,24 +227,38 @@ public void Removebomb(){
         booms.add(new Boom(boomX,boomY-64));
         booms.add(new Boom(boomX+64,boomY));
         booms.add(new Boom(boomX-64,boomY));
+        booms.add(new Boom(boomX,boomY));
+
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
             if (bombN == 1){
                 bombX = playerX;
                 bombY = playerY;
                 bombstime = TimeUtils.nanoTime();
+                boomstime = TimeUtils.nanoTime()+2000000000;
                 bombN = 0;
+                tempX = bombX;
+                tempY = bombY;
             }
         }
 
         if (TimeUtils.nanoTime() - bombstime >2000000000 ){
-            boomX = bombX;
-            boomY = bombY;
-
-
+            boomX = tempX;
+            boomY = tempY;
             bombX = 99999;
             bombY = 99999;
+
+            bombN = 1;
+
         }
+
+        if (TimeUtils.nanoTime() - boomstime >2000000000){
+            boomX = 99999;
+            boomY = 99999;
+        }
+
+
+        System.out.println("Time :" + TimeUtils.nanoTime() + " Boom : " + boomstime +" Bomb : "+bombstime);
 
         for (Bomb bomb : bombs){
             bomb.Draw(batch);
@@ -258,34 +266,35 @@ public void Removebomb(){
 
         for (Boom boom : booms){
             boom.Draw(batch);
+
         }
 
         batch.end();
 
         if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) {
 
-            if (moveableW == true)
+        //    if (moveableW == true)
             playerY += 500 * Gdx.graphics.getDeltaTime();
 
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
 
-            if (moveableA == true)
+         //   if (moveableA == true)
             playerX -= 500 * Gdx.graphics.getDeltaTime();
 
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
 
-            if (moveableS == true)
+         //   if (moveableS == true)
             playerY -= 500 * Gdx.graphics.getDeltaTime();
 
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
 
-            if (moveableD == true)
+         //   if (moveableD == true)
                 playerX += 500 * Gdx.graphics.getDeltaTime();
 
         }
@@ -304,6 +313,17 @@ public void Removebomb(){
                 if ((player.getX()+64 >= enemy.getX())&&(player.getX()<= enemy.getX()+64)){
                     game.setScreen(new GameoverScreen(game));
                 }
+            }
+
+            for (Boom boom:booms){
+
+                if(((enemy.getY() >= boom.getY())&&(enemy.getY() <= boom.getY()+64)) || ((enemy.getY()+64 >= boom.getY())&&(enemy.getY()+64 <= boom.getY()+64))){
+
+                    if ((enemy.getX()+64 >= boom.getX())&&(enemy.getX()<= boom.getX()+64)){
+                        enemys.remove(enemy);
+                    }
+                }
+
             }
 
 
