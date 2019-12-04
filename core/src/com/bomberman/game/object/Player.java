@@ -13,8 +13,10 @@ public class Player {
     float x,y,width,height;
 
 
-
-
+    /**
+     * crate sprite that has texture from hero.png
+     * and set size by 55,55 and recive position by x,y
+     */
     public Player(float x,float y) {
         //Constructor
 
@@ -25,11 +27,17 @@ public class Player {
     }
 
 
+    /**
+     * set this sprite to x,y position
+     */
     public void setPosition(float x,float y) {
         //Set position of object
         sprite.setPosition(x, y);
     }
 
+    /**
+     * @return rectangle of sprite for check collision
+     */
     public Rectangle rectangle(){
         Rectangle r = new Rectangle(sprite.getX(),sprite.getY(),sprite.getWidth(),sprite.getHeight());
         return  r;
@@ -55,6 +63,9 @@ public class Player {
     }
 
 
+    /**
+     * draw sprite
+     */
     public void Draw(SpriteBatch batch) {
         sprite.draw(batch);
     }

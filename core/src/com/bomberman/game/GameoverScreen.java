@@ -28,6 +28,9 @@ public class GameoverScreen implements Screen {
     public GameoverScreen(final BomberMan gam) {
         game = gam;
 
+        /**
+         * set background
+         */
         bg = new Texture("gameover.jpg");
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 1280, 1024);
@@ -37,12 +40,18 @@ public class GameoverScreen implements Screen {
 
         skin = new Skin(Gdx.files.internal("uiskin.json"));
 
+        /**
+         * restart button
+         */
         TextButton buttonStart = new TextButton("Restart",skin);
         buttonStart.setWidth(200);
         buttonStart.setHeight(50);
         buttonStart.setPosition(1280/2-200/2,700);
         stage.addActor(buttonStart);
 
+        /**
+         * click restart button
+         */
         buttonStart.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event,float x,float y){
@@ -51,12 +60,18 @@ public class GameoverScreen implements Screen {
             }
         });
 
+        /**
+         * exit button
+         */
         TextButton buttonExit = new TextButton("Exit",skin);
         buttonExit.setWidth(200);
         buttonExit.setHeight(50);
         buttonExit.setPosition(1280/2-200/2,150);
         stage.addActor(buttonExit);
 
+        /**
+         * click exit button
+         */
         buttonExit.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event,float x,float y){

@@ -3,6 +3,8 @@ package com.bomberman.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -37,6 +39,10 @@ public class GameScreen implements Screen {
     SpriteBatch batch;
     OrthographicCamera camera;
     Texture bg;
+    Music BgMusic;
+
+    Sound BombSound;
+    Sound BoomSound;
 
 
     LinkedList<Enemy> enemys;
@@ -72,23 +78,25 @@ public class GameScreen implements Screen {
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,0,0,0,2,0,0,2,0,2,2,0,2,2,2,2,0,0,0,1},
             {1,0,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,2,1},
-            {1,0,2,2,2,2,0,2,0,2,2,2,0,0,0,2,2,2,2,1},
+            {1,0,2,2,2,2,0,2,0,2,2,2,0,3,0,2,2,2,2,1},
             {1,0,1,2,1,2,1,2,1,2,1,0,1,0,1,0,1,2,0,1},
-            {1,0,2,2,2,2,0,0,0,0,0,0,2,2,2,0,0,0,0,1},
+            {1,0,2,2,2,2,0,0,3,3,0,0,2,2,2,0,0,0,0,1},
             {1,0,1,0,1,0,1,0,1,0,1,2,1,2,1,2,1,2,2,1},
-            {1,0,0,2,2,0,0,0,0,0,0,0,2,2,2,0,0,2,0,1},
+            {1,0,0,2,2,3,0,0,0,0,3,0,2,2,2,0,0,2,0,1},
             {1,0,1,2,1,0,1,2,1,0,1,0,1,0,1,0,1,2,0,1},
-            {1,0,0,2,2,0,2,2,2,0,2,0,0,0,2,2,2,0,0,1},
+            {1,0,0,2,2,0,2,2,2,3,2,0,0,0,2,2,2,0,0,1},
             {1,0,1,2,1,0,1,0,1,0,1,2,1,0,1,2,1,0,0,1},
-            {1,0,2,2,2,0,0,0,0,2,2,2,2,2,0,0,0,0,0,1},
+            {1,0,2,2,2,3,0,3,0,2,2,2,2,2,0,0,0,0,0,1},
             {1,0,1,2,1,0,1,2,1,0,1,2,1,0,1,0,1,0,0,1},
-            {1,0,0,0,0,0,2,2,2,0,2,2,2,0,0,0,0,0,0,1},
+            {1,0,0,3,0,0,2,2,2,0,2,2,2,0,0,0,0,3,0,1},
             {1,0,1,0,1,0,1,2,1,0,1,2,1,0,1,0,1,0,0,1},
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
 
     };
 
-
+    /**
+     * set ฺ bacckgrand and Sound
+     */
 
 
     public GameScreen(final BomberMan gam) {
@@ -101,12 +109,17 @@ public class GameScreen implements Screen {
         stage = new Stage(new StretchViewport(1280, 1024));
         Gdx.input.setInputProcessor(stage);
 
+        BgMusic = Gdx.audio.newMusic(Gdx.files.internal("bg.mp3"));
+        BgMusic.setLooping(true);
+        BombSound = Gdx.audio.newSound(Gdx.files.internal("bomb.mp3"));
+        BoomSound = Gdx.audio.newSound(Gdx.files.internal("boom.mp3"));
+
 
     }
 
 
     /**
-     * สร้างระเบิด
+     * check การทับซ้้อน
      */
 
 
@@ -145,6 +158,13 @@ public class GameScreen implements Screen {
         }
     }
 
+//    private void checkBomb (Rectangle boom, Rectangle block){
+//
+//        if (boom.overlaps(block)){
+//            bblockslist.remove(bblock);
+//        }
+//    }
+
 
     @Override
     public void show() {
@@ -155,8 +175,21 @@ public class GameScreen implements Screen {
 
         enemys = new LinkedList<>();
 
-        enemys.add(new Enemy(200,500));
-        enemys.add(new Enemy(500,400));
+        /**
+         * spawn enemy
+         */
+//        enemys.add(new Enemy(640,128));
+//        enemys.add(new Enemy(256,256));
+//        enemys.add(new Enemy(256,640));
+//        enemys.add(new Enemy(128,384));
+//        enemys.add(new Enemy(576,512));
+//        enemys.add(new Enemy(64,768));
+//        enemys.add(new Enemy(320,896));
+        BgMusic.play();
+
+        /**
+         * spawn block and enemy
+         */
 
         while(k<16) {
             while(l<20) {
@@ -169,12 +202,16 @@ public class GameScreen implements Screen {
                 }else if (this.map[k][l] == 2){
                     bblockslist.add(new Bblock(64*l,1024-64-(k*64)));
                     l++;
-                }
+                }else if (this.map[k][l] == 3) {
+                    enemys.add(new Enemy(64*l,1024-64-(k*64)));
 
+                    l++;
+                }
             }
             k++;
             l=0;
         }
+
 
 
     }
@@ -188,7 +225,14 @@ public class GameScreen implements Screen {
         camera.update();
         batch.setProjectionMatrix(camera.combined);
 
+        /**
+         * set player
+         */
         player = new Player(playerX,playerY);
+
+        /**
+         * make enemy move
+         */
         for (Enemy enemy : enemys){
             enemy.Move(delta);
         }
@@ -198,25 +242,44 @@ public class GameScreen implements Screen {
 
         batch.begin();
 
+        /**
+         * draw background
+         */
         batch.draw(bg,0,0);
 
 
+        /**
+         * draw ublock and check collision
+         */
         for (Ublock ublock : ublockslist) {
             ublock.Draw(batch);
             checkCollision(player.rectangle(),ublock.rectangle());
 
         }
 
+        /**
+         * draw bblock and check collision
+         */
         for (Bblock bblock : bblockslist) {
             bblock.Draw(batch);
             checkCollision(player.rectangle(),bblock.rectangle());
 
+//            for (Boom boom : booms){
+//                checkBomb(boom.rectangle(),bblock.rectangle());
+//            }
+
         }
 
+        /**
+         * draw ennemy
+         */
         for (Enemy enemy : enemys){
             enemy.Draw(batch);
         }
 
+        /**
+         * draw player
+         */
         player.Draw(batch);
 
         bombs.add(new Bomb(bombX,bombY));
@@ -228,8 +291,12 @@ public class GameScreen implements Screen {
         booms.add(new Boom(boomX,boomY));
 
 
+        /**
+         * set key spawn bomb
+         */
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
             if (bombN == 1){
+                BombSound.play();
                 bombX = playerX;
                 bombY = playerY;
                 bombstime = TimeUtils.nanoTime();
@@ -240,6 +307,9 @@ public class GameScreen implements Screen {
             }
         }
 
+        /**
+         * move bomb
+         */
         if (TimeUtils.nanoTime() - bombstime >2000000000 ){
             boomX = tempX;
             boomY = tempY;
@@ -250,13 +320,16 @@ public class GameScreen implements Screen {
 
         }
 
+        /**
+         * move boom
+         */
         if (TimeUtils.nanoTime() - boomstime >2000000000){
             boomX = 99999;
             boomY = 99999;
         }
 
 
-        System.out.println("Time :" + TimeUtils.nanoTime() + " Boom : " + boomstime +" Bomb : "+bombstime);
+//        System.out.println("Time :" + TimeUtils.nanoTime() + " Boom : " + boomstime +" Bomb : "+bombstime);
 
         for (Bomb bomb : bombs){
             bomb.Draw(batch);
@@ -265,11 +338,13 @@ public class GameScreen implements Screen {
         for (Boom boom : booms){
             boom.Draw(batch);
 
-
         }
 
         batch.end();
 
+        /**
+         * set move keys
+         */
         if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) {
 
         //    if (moveableW == true)
@@ -298,6 +373,15 @@ public class GameScreen implements Screen {
 
         }
 
+        if (Gdx.input.isKeyPressed(Input.Keys.L)){
+            System.out.println("Final Flash!!!!");
+            game.setScreen(new WinScreen(game));
+            BgMusic.dispose();
+        }
+
+        /**
+         * set player field
+         */
         if(player.getX() < 64) playerX = 64;
         if(player.getX()+64 > 1280-64) playerX = 1280-128;
 
@@ -306,56 +390,82 @@ public class GameScreen implements Screen {
 
 
 
-        for(Enemy enemy: enemys) {
-            if(((player.getY() >= enemy.getY())&&(player.getY() <= enemy.getY()+64)) || ((player.getY()+64 >= enemy.getY())&&(player.getY()+64 <= enemy.getY()+64))){
+        try {
+            /**
+             * player die when hit enemy
+             * go to gameoverscreen
+             */
+            for(Enemy enemy: enemys) {
+                if(((player.getY() >= enemy.getY())&&(player.getY() <= enemy.getY()+64)) || ((player.getY()+64 >= enemy.getY())&&(player.getY()+64 <= enemy.getY()+64))){
 
-                if ((player.getX()+64 >= enemy.getX())&&(player.getX()<= enemy.getX()+64)){
-                    game.setScreen(new GameoverScreen(game));
-                }
-            }
+                    if ((player.getX()+64 >= enemy.getX())&&(player.getX()<= enemy.getX()+64)){
+                        game.setScreen(new GameoverScreen(game));
+                        BgMusic.dispose();
 
-            for (Boom boom:booms){
-
-                if(((enemy.getY() >= boom.getY())&&(enemy.getY() <= boom.getY()+64)) || ((enemy.getY()+64 >= boom.getY())&&(enemy.getY()+64 <= boom.getY()+64))){
-
-                    if ((enemy.getX()+64 >= boom.getX())&&(enemy.getX()<= boom.getX()+64)){
-                        enemys.remove(enemy);
                     }
                 }
 
-                if (enemys.isEmpty()){
-                    game.setScreen(new WinScreen(game));
+                /**
+                 * remove enemy when hit fire
+                 */
 
+                for (Boom boom:booms){
+
+                    if(((enemy.getY() >= boom.getY())&&(enemy.getY() <= boom.getY()+64)) || ((enemy.getY()+64 >= boom.getY())&&(enemy.getY()+64 <= boom.getY()+64))){
+
+                        if ((enemy.getX()+64 >= boom.getX())&&(enemy.getX()<= boom.getX()+64)){
+                            enemys.remove(enemy);
+                        }
+                    }
+                    /**
+                     * when enemy all remove go to winscreen
+                     */
+                    if (enemys.isEmpty()){
+                        game.setScreen(new WinScreen(game));
+
+                        BgMusic.dispose();
+                    }
                 }
-
             }
-
+        }catch (Exception e){
 
         }
 
+
        for (Boom boom:booms){
 
+           /**
+            * when player hit fire go to gameoverscreen
+            */
             if(((player.getY() >= boom.getY())&&(player.getY() <= boom.getY()+64)) || ((player.getY()+64 >= boom.getY())&&(player.getY()+64 <= boom.getY()+64))){
 
                 if ((player.getX()+64 >= boom.getX())&&(player.getX()<= boom.getX()+64)){
-                    game.setScreen(new GameScreen(game));
+                    game.setScreen(new GameoverScreen(game));
+                    BoomSound.play();
+                    BgMusic.dispose();
+
                 }
             }
 
             try{
+                /**
+                 * when fire hit bblock remove bblock
+                 */
                 for (Bblock bblock : bblockslist){
-                    if(((bblock.getY() >= boom.getY())&&(bblock.getY() <= boom.getY()+64)) || ((bblock.getY()+64 >= boom.getY())&&(bblock.getY()+64 <= boom.getY()+64))){
+                if(((bblock.getY() >= boom.getY())&&(bblock.getY() <= boom.getY()+64)) || ((bblock.getY()+64 >= boom.getY())&&(bblock.getY()+64 <= boom.getY()+64))){
 
-                        if ((bblock.getX()+64 >= boom.getX())&&(bblock.getX()<= boom.getX()+64)){
-                            bblockslist.remove(bblock);
-                        }
-                    }
+                    if ((bblock.getX()+64 > boom.getX())&&(bblock.getX()< boom.getX()+64)){
+                    bblockslist.remove(bblock);
                 }
+            }
+        }
             }catch (Exception e){
 
             }
 
         }
+
+
 
 
     }

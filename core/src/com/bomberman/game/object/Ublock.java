@@ -15,9 +15,10 @@ public class Ublock {
     Texture texture;
     float x,y,width,height;
 
-
-
-
+    /**
+     * crate sprite that has texture from Ublock.png
+     * and set size by 64,64 and recive position by x,y
+     */
     public Ublock(float x,float y) {
         //Constructor
 
@@ -27,12 +28,17 @@ public class Ublock {
         sprite.setSize(64, 64);
     }
 
-
+    /**
+     * set this sprite to x,y position
+     */
     public void setPosition(float x,float y) {
         //Set position of object
         sprite.setPosition(x, y);
     }
 
+    /**
+     * @return rectangle of sprite for check collision
+     */
     public Rectangle rectangle(){
         Rectangle r = new Rectangle(sprite.getX(),sprite.getY(),sprite.getWidth(),sprite.getHeight());
         return  r;
@@ -58,8 +64,9 @@ public class Ublock {
     }
 
 
-
-
+    /**
+     * draw sprite
+     */
     public void Draw(SpriteBatch batch) {
         sprite.draw(batch);
     }

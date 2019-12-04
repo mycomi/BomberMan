@@ -2,6 +2,7 @@ package com.bomberman.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -22,11 +23,21 @@ public class WinScreen implements Screen {
     private Skin skin;
     SpriteBatch batch;
     Texture bg;
+    Sound WinSound;
 
     public WinScreen(final BomberMan gam) {
         game = gam;
 
-        bg = new Texture("gameover.jpg");
+        /**
+         * background
+         */
+        bg = new Texture("win.jpg");
+
+        /**
+         * win sound
+         */
+        WinSound = Gdx.audio.newSound(Gdx.files.internal("Win.mp3"));
+
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 1280, 1024);
 
@@ -35,12 +46,18 @@ public class WinScreen implements Screen {
 
         skin = new Skin(Gdx.files.internal("uiskin.json"));
 
+        /**
+         * play again button
+         */
         TextButton buttonStart = new TextButton("Play again",skin);
         buttonStart.setWidth(200);
         buttonStart.setHeight(50);
-        buttonStart.setPosition(1280/2-200/2,700);
+        buttonStart.setPosition(1280/2-200/2,250);
         stage.addActor(buttonStart);
 
+        /**
+         * click play again button
+         */
         buttonStart.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y){
@@ -49,12 +66,18 @@ public class WinScreen implements Screen {
             }
         });
 
+        /**
+         * exit button
+         */
         TextButton buttonExit = new TextButton("Exit",skin);
         buttonExit.setWidth(200);
         buttonExit.setHeight(50);
         buttonExit.setPosition(1280/2-200/2,150);
         stage.addActor(buttonExit);
 
+        /**
+         * click exit button
+         */
         buttonExit.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event,float x,float y){
@@ -70,6 +93,10 @@ public class WinScreen implements Screen {
     @Override
     public void show() {
 
+        /**
+         * play win sound
+         */
+        WinSound.play();
     }
 
     @Override
